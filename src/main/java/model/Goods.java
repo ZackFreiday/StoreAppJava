@@ -10,13 +10,20 @@ public abstract class Goods implements Serializable{
     protected int quantity;
     protected LocalDate expirationDate;
 
-    public Goods(String id, String name, double unitDeliveryPrice, int quantity, LocalDate expirationDate) {
-        this.id = id;
-        this.name = name;
-        this.unitDeliveryPrice = unitDeliveryPrice;
-        this.quantity = quantity;
-        this.expirationDate = expirationDate;
+public Goods(String id, String name, double unitDeliveryPrice, int quantity, LocalDate expirationDate) {
+    if (unitDeliveryPrice < 0) {
+        throw new IllegalArgumentException("Delivery price must be non-negative.");
     }
+    if (quantity < 0) {
+        throw new IllegalArgumentException("Quantity must be non-negative.");
+    }
+    this.id = id;
+    this.name = name;
+    this.unitDeliveryPrice = unitDeliveryPrice;
+    this.quantity = quantity;
+    this.expirationDate = expirationDate;
+}
+
 
     public abstract double calculateSellingPrice(LocalDate today, double markupPercentage, int expirationThresholdDays, double discountPercentage);
 

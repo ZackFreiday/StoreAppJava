@@ -1,5 +1,8 @@
 package model;
 
+import model.exceptions.InsufficientQuantityException;
+import model.service.StoreService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -8,8 +11,10 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class StoreTestJUnit {
+public class StoreServiceTestJUnit {
+
     private Store store;
+    private StoreService storeService;
     private Cashier cashier;
     private Customer customer;
     private Goods bread;
@@ -18,14 +23,18 @@ public class StoreTestJUnit {
     @BeforeEach
     public void setup() {
         store = new Store("TestStore", 30.0, 50.0, 3, 20.0);
+        storeService = new StoreService(store);
+
         cashier = new Cashier("C001", "Alice", 1500.0);
         customer = new Customer("John", 100.0);
-        store.addCashier(cashier);
+
+        storeService.addCashier(cashier);
 
         bread = new FoodItem("F001", "Bread", 1.0, 10, LocalDate.now().plusDays(2));
         shampoo = new NonFoodItem("N001", "Shampoo", 2.0, 5, LocalDate.now().plusDays(10));
-        store.loadGoods(bread);
-        store.loadGoods(shampoo);
+
+        storeService.loadGoods(bread);
+        storeService.loadGoods(shampoo);
     }
 
     @Test
@@ -34,19 +43,20 @@ public class StoreTestJUnit {
         cart.put("F001", 2);
         cart.put("N001", 1);
 
-        Receipt receipt = store.sellGoods(cart, customer, cashier);
+        Receipt receipt = storeService.sellGoods(cart, customer, cashier);
+
         assertNotNull(receipt);
-        assertEquals(1, store.getTotalReceiptsIssued());
+        assertEquals(1, storeService.getTotalReceiptsIssued());
         assertEquals(3, receipt.getItems().stream().mapToInt(ReceiptItem::getQuantity).sum());
     }
 
     @Test
     public void testInsufficientQuantityThrowsException() {
         Map<String, Integer> cart = new HashMap<>();
-        cart.put("F001", 20); // More than in stock
+        cart.put("F001", 20); 
 
         Exception exception = assertThrows(InsufficientQuantityException.class, () -> {
-            store.sellGoods(cart, customer, cashier);
+            storeService.sellGoods(cart, customer, cashier);
         });
 
         assertTrue(exception.getMessage().contains("Insufficient quantity"));
@@ -55,12 +65,13 @@ public class StoreTestJUnit {
     @Test
     public void testSellingExpiredItemFails() {
         Goods expiredItem = new FoodItem("F002", "Old Bread", 1.0, 5, LocalDate.now().minusDays(1));
-        store.loadGoods(expiredItem);
+        storeService.loadGoods(expiredItem);
+
         Map<String, Integer> cart = new HashMap<>();
         cart.put("F002", 1);
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            store.sellGoods(cart, customer, cashier);
+            storeService.sellGoods(cart, customer, cashier);
         });
 
         assertTrue(exception.getMessage().contains("expired"));
@@ -73,7 +84,7 @@ public class StoreTestJUnit {
         cart.put("F001", 1);
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            store.sellGoods(cart, poorCustomer, cashier);
+            storeService.sellGoods(cart, poorCustomer, cashier);
         });
 
         assertTrue(exception.getMessage().contains("enough funds"));
@@ -85,10 +96,10 @@ public class StoreTestJUnit {
         cart.put("F001", 2);
         cart.put("N001", 1);
 
-        store.sellGoods(cart, customer, cashier);
+        storeService.sellGoods(cart, customer, cashier);
 
-        double turnover = store.getTotalTurnover();
-        double profit = store.getProfit();
+        double turnover = storeService.getTotalTurnover();
+        double profit = storeService.getProfit();
 
         assertTrue(turnover > 0);
         assertTrue(profit < turnover);

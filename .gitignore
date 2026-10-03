@@ -1,0 +1,19 @@
+# Maven build output
+target/
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+
+# Runtime-generated receipt files
+receipt_*.ser
+receipt_*.txt
+receipt_counter.txt
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -4,10 +4,13 @@ public class Customer {
     private String name;
     private double balance;
 
-    public Customer(String name, double balance) {
-        this.name = name;
-        this.balance = balance;
+public Customer(String name, double balance) {
+    if (balance < 0) {
+        throw new IllegalArgumentException("Customer balance must be non-negative.");
     }
+    this.name = name;
+    this.balance = balance;
+}
 
     public String getName() {
         return name;

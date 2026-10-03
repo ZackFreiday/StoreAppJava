@@ -58,24 +58,6 @@ public class Receipt implements Serializable {
         System.out.println(this);
     }
 
-    public void saveToTextFile() {
-        String fileName = "receipt_" + serialNumber + ".txt";
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            writer.write(this.toString());
-        } catch (IOException e) {
-            System.err.println("Error writing receipt: " + e.getMessage());
-        }
-    }
-
-    public void saveSerialized() {
-        String fileName = "receipt_" + serialNumber + ".ser";
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName))) {
-            out.writeObject(this);
-        } catch (IOException e) {
-            System.err.println("Serialization error: " + e.getMessage());
-        }
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -91,13 +73,4 @@ public class Receipt implements Serializable {
         return sb.toString();
     }
 
-    public static Receipt loadSerialized(int serialNumber) {
-        String fileName = "receipt_" + serialNumber + ".ser";
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(fileName))) {
-            return (Receipt) in.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            System.err.println("Deserialization error: " + e.getMessage());
-            return null;
-        }
-    }
 }
